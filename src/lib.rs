@@ -36,12 +36,14 @@ mod tests {
     #[test]
     fn it_works() {
         let mut resources = Resources::default();
-
         resources.insert(TestResource("Hello, World!"));
 
         {
-            let resource = resources.get_mut::<TestResource>().unwrap();
+            let mut resource = resources.get_mut::<TestResource>().unwrap();
+            resource.0 = "Goodbye, World!";
         }
-        
+
+        let resource = resources.get::<TestResource>().unwrap();
+        assert_eq!(resource.0, "Goodbye, World!"); 
     }
 }
