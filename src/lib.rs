@@ -53,6 +53,10 @@ impl Resources {
         unsafe { self.inner.insert(Box::from(resource)) }
     }
 
+    pub fn remove<T: Resource>(&mut self) -> Option<T> {
+        None
+    }
+
     pub fn get<T: Resource>(&self) -> Result<AtomicRef<T>, AccessError> {
         // Safety: `Resources` is `!Send` / `!Sync`, so it is not possible for it to modify the
         // `UnsafeResources` store on another thread.
