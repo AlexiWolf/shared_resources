@@ -14,6 +14,10 @@ impl<T> Resource for T where T: 'static {}
 
 impl_downcast!(Resource);
 
+struct ResourceCell {
+
+}
+
 #[derive(Default)]
 pub struct Resources {
 
