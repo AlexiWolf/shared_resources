@@ -28,5 +28,10 @@ mod tests {
         let mut resources = Resources::default();
 
         resources.insert(TestResource("Hello, World!"));
+
+        {
+            let resource = resources.get_mut::<TestResource>().unwrap();
+        }
+        
     }
 }
