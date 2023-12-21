@@ -43,7 +43,14 @@ impl Resources {
     }
 
     pub fn get_mut<T: Resource>(&self) -> Result<AtomicRefMut<T>, AccessError> {
-        Err(AccessError::NoSuchResource)
+        let type_id = TypeId::of::<T>();
+        match unsafe { self.inner.get(&type_id) } {
+            Some(cell) => Ok(
+                cell
+                    .try_borrow_mut()?
+            ),
+            None => todo!(),
+        }
     }
 }
 
