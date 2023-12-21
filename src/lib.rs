@@ -24,6 +24,13 @@ impl ResourceCell {
             inner: AtomicRefCell::new(resource),
         }
     }
+
+    pub fn try_borrow_mut<T: Resource>(&self) -> Result<AtomicRef<T>, AccessError> {
+        match self.inner.try_borrow_mut() {
+            Ok(_) => todo!(),
+            Err(_) => Err(AccessError::AlreadyBorrowed),
+        }
+    }
 }
 
 #[derive(Default)]
