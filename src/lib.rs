@@ -161,6 +161,6 @@ mod tests {
             assert_eq!(resource.0, "Hello, World!");
         } 
 
-        let resource = resources.remove::<TestResource>().unwrap();
+        assert!(resources.remove::<TestResource>().is_some());
     }
 }
