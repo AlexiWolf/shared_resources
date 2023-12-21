@@ -97,11 +97,8 @@ impl Resources {
         }
     }
 }
-
-/// # Safety
-///
-/// It's not safe to access `!Send` / `!Sync` types on any thread other than the one that owns 
-/// the resources store.  Only `Send` / `Sync` types can be accessed from other threads.
+/// Provides a [`Resource`] container which does run-time borrow-checking, but *does not* ensure 
+/// [`!Send`] / [`!Sync`] types are not accessed across threads.
 #[derive(Default)]
 struct UnsafeResources {
     resources: HashMap<TypeId, ResourceCell>,
@@ -111,25 +108,23 @@ impl UnsafeResources {
 
     /// # Safety
     ///
-    /// It's not safe to access `!Send` / `!Sync` types on any thread other than the one that owns 
-    /// the resources store.  Only `Send` / `Sync` types can be accessed from other threads.
+    /// [`!Send`] types cannot be inserted from any thread that doesn't own the resource store.
     pub unsafe fn insert(&mut self, resource: Box<dyn Resource>) {
         let type_id = resource.type_id();
         self.resources.insert(type_id, ResourceCell::new(resource));
     }
-
+    
     /// # Safety
     ///
-    /// It's not safe to access `!Send` / `!Sync` types on any thread other than the one that owns 
-    /// the resources store.  Only `Send` / `Sync` types can be accessed from other threads.
+    /// [`!Send`] types cannot be removed from any thread that doesn't own the resource store.
     pub unsafe fn remove(&mut self, type_id: &TypeId) -> Option<Box<dyn Resource>> {
         self.resources.remove(type_id).map(|cell| cell.into_inner())
     }
 
     /// # Safety
     ///
-    /// It's not safe to access `!Send` / `!Sync` types on any thread other than the one that owns 
-    /// the resources store.  Only `Send` / `Sync` types can be accessed from other threads.
+    /// [`!Send`] / [`!Sync`] types cannot be accessed from any thread that doesn't own the 
+    /// resource store.
     pub unsafe fn get(&self, type_id: &TypeId) -> Option<&ResourceCell> {
         self.resources.get(type_id)
     }
