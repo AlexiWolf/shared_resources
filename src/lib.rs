@@ -25,7 +25,11 @@ pub struct Resources {
 
 impl Resources {
     pub fn insert<T: Resource>(&mut self, resource: T) {
-        
+        let type_id = resource.type_id();
+
+        // Safety: `Resources` is `!Send` / `!Sync`, so it is not possible for it to modify the
+        // `UnsafeResources` store on another thread.
+        unsafe { self.inner.insert(type_id, Box::from(resource)) }
     }
 
     pub fn get<T: Resource>(&self) -> Result<AtomicRefMut<T>, AccessError> {
