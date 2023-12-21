@@ -26,6 +26,10 @@ impl ResourceCell {
         }
     }
 
+    fn into_inner(self) -> Box<dyn Resource> {
+        self.inner.into_inner()
+    }
+
     pub fn try_borrow<T: Resource>(&self) -> Result<AtomicRef<T>, AccessError> {
         match self.inner.try_borrow() {
             Ok(borrow) => Ok(AtomicRef::map(borrow, |inner| inner.downcast_ref().unwrap())),
