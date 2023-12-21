@@ -54,6 +54,8 @@ impl Resources {
     }
 
     pub fn get<T: Resource>(&self) -> Result<AtomicRef<T>, AccessError> {
+        // Safety: `Resources` is `!Send` / `!Sync`, so it is not possible for it to modify the
+        // `UnsafeResources` store on another thread.
         let type_id = TypeId::of::<T>();
         match unsafe { self.inner.get(&type_id) } {
             Some(cell) => Ok(
@@ -65,6 +67,8 @@ impl Resources {
     }
 
     pub fn get_mut<T: Resource>(&self) -> Result<AtomicRefMut<T>, AccessError> {
+        // Safety: `Resources` is `!Send` / `!Sync`, so it is not possible for it to modify the
+        // `UnsafeResources` store on another thread.
         let type_id = TypeId::of::<T>();
         match unsafe { self.inner.get(&type_id) } {
             Some(cell) => Ok(
