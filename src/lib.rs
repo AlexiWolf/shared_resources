@@ -1,3 +1,7 @@
+use downcast_rs::Downcast;
+
+pub trait Resource: Downcast + 'static {}
+
 #[derive(Default)]
 pub struct Resources {
 
