@@ -22,6 +22,10 @@ impl Resources {
         
     }
 
+    pub fn get<T: Resource>(&self) -> Result<AtomicRefMut<T>, AccessError> {
+        todo!()
+    }
+
     pub fn get_mut<T: Resource>(&self) -> Result<AtomicRefMut<T>, AccessError> {
         todo!()
     }
