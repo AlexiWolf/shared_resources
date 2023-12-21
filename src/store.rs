@@ -21,18 +21,14 @@ impl Resources {
         // `UnsafeResources` store from another thread.
         unsafe { self.inner.insert(Box::from(resource)) }
     }
-    
+
     /// Removes the instance of type `T` from the store, if it exists.
     pub fn remove<T: Resource>(&mut self) -> Option<T> {
         // Safety: `Resources` is `!Send` / `!Sync`, so it is not possible for it to modify the
         // `UnsafeResources` store from another thread.
         let type_id = TypeId::of::<T>();
         unsafe {
-            let resource = self
-                .inner
-                .remove(&type_id)?
-                .downcast::<T>()
-                .ok()?;
+            let resource = self.inner.remove(&type_id)?.downcast::<T>().ok()?;
             Some(*resource)
         }
     }
@@ -49,10 +45,7 @@ impl Resources {
         // `UnsafeResources` store from another thread.
         let type_id = TypeId::of::<T>();
         match unsafe { self.inner.get(&type_id) } {
-            Some(cell) => Ok(
-                cell
-                    .try_borrow()?
-            ),
+            Some(cell) => Ok(cell.try_borrow()?),
             None => Err(AccessError::NoSuchResource),
         }
     }
@@ -68,10 +61,7 @@ impl Resources {
         // `UnsafeResources` store on another thread.
         let type_id = TypeId::of::<T>();
         match unsafe { self.inner.get(&type_id) } {
-            Some(cell) => Ok(
-                cell
-                    .try_borrow_mut()?
-            ),
+            Some(cell) => Ok(cell.try_borrow_mut()?),
             None => Err(AccessError::NoSuchResource),
         }
     }
@@ -94,7 +84,7 @@ mod tests {
         }
 
         let resource = resources.get::<TestResource>().unwrap();
-        assert_eq!(resource.0, "Goodbye, World!"); 
+        assert_eq!(resource.0, "Goodbye, World!");
     }
 
     #[test]
@@ -105,13 +95,13 @@ mod tests {
         {
             let resource = resources.get::<TestResource>().unwrap();
             assert_eq!(resource.0, "Hello, World!");
-        } 
+        }
 
         assert!(resources.remove::<TestResource>().is_some());
     }
 }
 
-/// Provides a [`Resource`] container which does run-time borrow-checking, but *does not* ensure 
+/// Provides a [`Resource`] container which does run-time borrow-checking, but *does not* ensure
 /// [`!Send`] / [`!Sync`] types are not accessed across threads.
 #[derive(Default)]
 struct UnsafeResources {
@@ -119,7 +109,6 @@ struct UnsafeResources {
 }
 
 impl UnsafeResources {
-
     /// # Safety
     ///
     /// [`!Send`] types cannot be inserted from any thread that doesn't own the resource store.
@@ -127,7 +116,7 @@ impl UnsafeResources {
         let type_id = resource.type_id();
         self.resources.insert(type_id, ResourceCell::new(resource));
     }
-    
+
     /// # Safety
     ///
     /// [`!Send`] types cannot be removed from any thread that doesn't own the resource store.
@@ -137,7 +126,7 @@ impl UnsafeResources {
 
     /// # Safety
     ///
-    /// [`!Send`] / [`!Sync`] types cannot be accessed from any thread that doesn't own the 
+    /// [`!Send`] / [`!Sync`] types cannot be accessed from any thread that doesn't own the
     /// resource store.
     pub unsafe fn get(&self, type_id: &TypeId) -> Option<&ResourceCell> {
         self.resources.get(type_id)
