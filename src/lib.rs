@@ -1,6 +1,10 @@
 use atomic_refcell::*;
 use downcast_rs::{Downcast, impl_downcast};
 
+pub enum AccessError {
+
+}
+
 pub trait Resource: Downcast + 'static {}
 
 impl<T> Resource for T where T: 'static {}
