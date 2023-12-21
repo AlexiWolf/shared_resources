@@ -29,11 +29,11 @@ impl Resources {
     }
 
     pub fn get<T: Resource>(&self) -> Result<AtomicRefMut<T>, AccessError> {
-        AccessError::NoSuchResource
+        Err(AccessError::NoSuchResource)
     }
 
     pub fn get_mut<T: Resource>(&self) -> Result<AtomicRefMut<T>, AccessError> {
-        AccessError::NoSuchResource
+        Err(AccessError::NoSuchResource)
     }
 }
 
