@@ -1,3 +1,7 @@
+pub struct Resources {
+
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
