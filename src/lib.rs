@@ -15,7 +15,15 @@ impl<T> Resource for T where T: 'static {}
 impl_downcast!(Resource);
 
 struct ResourceCell {
+    inner: AtomicRefCell<Box<dyn Resource>>,
+}
 
+impl ResourceCell {
+    fn new(resource: Box<dyn Resource>) -> Self {
+        Self {
+            inner: AtomicRefCell::new(resource),
+        }
+    }
 }
 
 #[derive(Default)]
