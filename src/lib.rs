@@ -58,7 +58,17 @@ impl Resources {
     }
 
     pub fn remove<T: Resource>(&mut self) -> Option<T> {
-        None
+        // Safety: `Resources` is `!Send` / `!Sync`, so it is not possible for it to modify the
+        // `UnsafeResources` store on another thread.
+        let type_id = TypeId::of::<T>();
+        unsafe {
+            let resource = self
+                .inner
+                .remove(&type_id)?
+                .downcast::<T>()
+                .ok()?;
+            Some(*resource)
+        }
     }
 
     pub fn get<T: Resource>(&self) -> Result<AtomicRef<T>, AccessError> {
