@@ -1,3 +1,5 @@
+use std::{collections::HashMap, any::TypeId};
+
 use atomic_refcell::*;
 use downcast_rs::{Downcast, impl_downcast};
 
@@ -31,6 +33,11 @@ impl Resources {
     }
 }
 
+#[derive(Default)]
+struct UnsafeResources {
+    resources: HashMap<TypeId, ResourceCell>,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -38,7 +45,7 @@ mod tests {
     struct TestResource(&'static str);
 
     #[test]
-    fn it_works() {
+    fn should_access_stored_resources() {
         let mut resources = Resources::default();
         resources.insert(TestResource("Hello, World!"));
 
