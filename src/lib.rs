@@ -29,7 +29,7 @@ impl Resources {
 
         // Safety: `Resources` is `!Send` / `!Sync`, so it is not possible for it to modify the
         // `UnsafeResources` store on another thread.
-        unsafe { self.inner.insert(type_id, Box::from(resource)) }
+        unsafe { self.inner.insert(Box::from(resource)) }
     }
 
     pub fn get<T: Resource>(&self) -> Result<AtomicRefMut<T>, AccessError> {
@@ -44,6 +44,18 @@ impl Resources {
 #[derive(Default)]
 struct UnsafeResources {
     resources: HashMap<TypeId, ResourceCell>,
+}
+
+impl UnsafeResources {
+
+    /// # Safety
+    ///
+    /// It's not safe to modify `!Send` / `!Sync` on any thread other than the one that owns the
+    /// resources store.  Only `Send` / `Sync` types can be modified from other threads.
+    pub unsafe fn insert(&mut self, resource: Box<dyn Resource>) {
+        let type_id = resource.type_id();
+        self.resources.insert(type_id, ResourceCell::new(resource));
+    }
 }
 
 #[cfg(test)]
