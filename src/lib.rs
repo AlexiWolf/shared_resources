@@ -53,13 +53,13 @@ pub struct Resources {
 impl Resources {
     pub fn insert<T: Resource>(&mut self, resource: T) {
         // Safety: `Resources` is `!Send` / `!Sync`, so it is not possible for it to modify the
-        // `UnsafeResources` store on another thread.
+        // `UnsafeResources` store from another thread.
         unsafe { self.inner.insert(Box::from(resource)) }
     }
 
     pub fn remove<T: Resource>(&mut self) -> Option<T> {
         // Safety: `Resources` is `!Send` / `!Sync`, so it is not possible for it to modify the
-        // `UnsafeResources` store on another thread.
+        // `UnsafeResources` store from another thread.
         let type_id = TypeId::of::<T>();
         unsafe {
             let resource = self
@@ -72,8 +72,8 @@ impl Resources {
     }
 
     pub fn get<T: Resource>(&self) -> Result<AtomicRef<T>, AccessError> {
-        // Safety: `Resources` is `!Send` / `!Sync`, so it is not possible for it to modify the
-        // `UnsafeResources` store on another thread.
+        // Safety: `Resources` is `!Send` / `!Sync`, so it is not possible for it to access the
+        // `UnsafeResources` store from another thread.
         let type_id = TypeId::of::<T>();
         match unsafe { self.inner.get(&type_id) } {
             Some(cell) => Ok(
