@@ -102,6 +102,14 @@ impl UnsafeResources {
 
     /// # Safety
     ///
+    /// It's not safe to access `!Send` / `!Sync` types on any thread other than the one that owns 
+    /// the resources store.  Only `Send` / `Sync` types can be accessed from other threads.
+    pub unsafe fn remove(&mut self, type_id: &TypeId) {
+        self.resources.remove(type_id).map(|cell| cell.into_inner())
+    }
+
+    /// # Safety
+    ///
     /// It's not safe to access `!Send` / `!Sync` on any thread other than the one that owns the
     /// resources store.  Only `Send` / `Sync` types can be accessed from other threads.
     pub unsafe fn get(&self, type_id: &TypeId) -> Option<&ResourceCell> {
