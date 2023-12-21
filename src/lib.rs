@@ -8,7 +8,7 @@ pub struct Resources {
 }
 
 impl Resources {
-    pub fn insert<T: Resource>(&mut self) {
+    pub fn insert<T: Resource>(&mut self, resource: T) {
 
     }
 }
