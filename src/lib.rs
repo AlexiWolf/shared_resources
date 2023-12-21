@@ -6,6 +6,7 @@ use downcast_rs::{Downcast, impl_downcast};
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum AccessError {
     NoSuchResource,
+    AlreadyBorrowed,
 }
 
 pub trait Resource: Downcast + 'static {}
