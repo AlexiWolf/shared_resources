@@ -20,7 +20,7 @@ struct ResourceCell {
 
 #[derive(Default)]
 pub struct Resources {
-
+    inner: UnsafeResources,
 }
 
 impl Resources {
