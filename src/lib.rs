@@ -1,8 +1,10 @@
-use downcast_rs::Downcast;
+use downcast_rs::{Downcast, impl_downcast};
 
 pub trait Resource: Downcast + 'static {}
 
 impl<T> Resource for T where T: 'static {}
+
+impl_downcast!(Resource);
 
 #[derive(Default)]
 pub struct Resources {
