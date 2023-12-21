@@ -2,6 +2,8 @@ use downcast_rs::Downcast;
 
 pub trait Resource: Downcast + 'static {}
 
+impl<T> Resource for T where T: 'static {}
+
 #[derive(Default)]
 pub struct Resources {
 
@@ -9,7 +11,7 @@ pub struct Resources {
 
 impl Resources {
     pub fn insert<T: Resource>(&mut self, resource: T) {
-
+        
     }
 }
 
