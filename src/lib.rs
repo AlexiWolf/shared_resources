@@ -124,4 +124,17 @@ mod tests {
         let resource = resources.get::<TestResource>().unwrap();
         assert_eq!(resource.0, "Goodbye, World!"); 
     }
+
+    #[test]
+    fn should_insert_and_remove_resources() {
+        let mut resources = Resources::default();
+        resources.insert(TestResource("Hello, World!"));
+
+        {
+            let resource = resources.get::<TestResource>().unwrap();
+            assert_eq!(resource.0, "Hello, World!");
+        } 
+
+        let resource = resources.remove::<TestResource>().unwrap();
+    }
 }
