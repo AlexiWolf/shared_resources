@@ -98,6 +98,10 @@ impl Resources {
     }
 }
 
+/// # Safety
+///
+/// It's not safe to access `!Send` / `!Sync` types on any thread other than the one that owns 
+/// the resources store.  Only `Send` / `Sync` types can be accessed from other threads.
 #[derive(Default)]
 struct UnsafeResources {
     resources: HashMap<TypeId, ResourceCell>,
@@ -107,8 +111,8 @@ impl UnsafeResources {
 
     /// # Safety
     ///
-    /// It's not safe to modify `!Send` / `!Sync` on any thread other than the one that owns the
-    /// resources store.  Only `Send` / `Sync` types can be modified from other threads.
+    /// It's not safe to access `!Send` / `!Sync` types on any thread other than the one that owns 
+    /// the resources store.  Only `Send` / `Sync` types can be accessed from other threads.
     pub unsafe fn insert(&mut self, resource: Box<dyn Resource>) {
         let type_id = resource.type_id();
         self.resources.insert(type_id, ResourceCell::new(resource));
@@ -124,8 +128,8 @@ impl UnsafeResources {
 
     /// # Safety
     ///
-    /// It's not safe to access `!Send` / `!Sync` on any thread other than the one that owns the
-    /// resources store.  Only `Send` / `Sync` types can be accessed from other threads.
+    /// It's not safe to access `!Send` / `!Sync` types on any thread other than the one that owns 
+    /// the resources store.  Only `Send` / `Sync` types can be accessed from other threads.
     pub unsafe fn get(&self, type_id: &TypeId) -> Option<&ResourceCell> {
         self.resources.get(type_id)
     }
