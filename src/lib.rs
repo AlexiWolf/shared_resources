@@ -96,6 +96,10 @@ impl UnsafeResources {
         self.resources.insert(type_id, ResourceCell::new(resource));
     }
 
+    /// # Safety
+    ///
+    /// It's not safe to modify `!Send` / `!Sync` on any thread other than the one that owns the
+    /// resources store.  Only `Send` / `Sync` types can be modified from other threads.
     pub unsafe fn get(&self, type_id: &TypeId) -> Option<&ResourceCell> {
         None
     }
