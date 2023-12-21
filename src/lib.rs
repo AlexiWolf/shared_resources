@@ -5,7 +5,7 @@ use downcast_rs::{Downcast, impl_downcast};
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum AccessError {
-
+    NoSuchResource,
 }
 
 pub trait Resource: Downcast + 'static {}
@@ -29,11 +29,11 @@ impl Resources {
     }
 
     pub fn get<T: Resource>(&self) -> Result<AtomicRefMut<T>, AccessError> {
-        todo!()
+        AccessError::NoSuchResource
     }
 
     pub fn get_mut<T: Resource>(&self) -> Result<AtomicRefMut<T>, AccessError> {
-        todo!()
+        AccessError::NoSuchResource
     }
 }
 
