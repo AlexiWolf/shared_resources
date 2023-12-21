@@ -57,7 +57,7 @@ impl Resources {
                 cell
                     .try_borrow_mut()?
             ),
-            None => todo!(),
+            None => Err(AccessError::NoSuchResource),
         }
     }
 }
