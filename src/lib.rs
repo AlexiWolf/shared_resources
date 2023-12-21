@@ -45,18 +45,27 @@ impl ResourceCell {
     }
 }
 
+
+/// Provides a shared [`Resource`] container.
 #[derive(Default)]
 pub struct Resources {
     inner: UnsafeResources,
 }
 
 impl Resources {
+
+    /// Inserts a [`Resource`] of type `T` into the store.
+    ///
+    /// If an instance of `T` already exists, it is quietly replaced with the new instance.
+    ///
+    /// Call [`Resources::remove()`] first, if you want to retrieve the existing instance.
     pub fn insert<T: Resource>(&mut self, resource: T) {
         // Safety: `Resources` is `!Send` / `!Sync`, so it is not possible for it to modify the
         // `UnsafeResources` store from another thread.
         unsafe { self.inner.insert(Box::from(resource)) }
     }
-
+    
+    /// Removes the instance of type `T` from the store, if it exists.
     pub fn remove<T: Resource>(&mut self) -> Option<T> {
         // Safety: `Resources` is `!Send` / `!Sync`, so it is not possible for it to modify the
         // `UnsafeResources` store from another thread.
@@ -71,6 +80,13 @@ impl Resources {
         }
     }
 
+    /// Returns an immutable reference to the stored `T`, if it exists.
+    ///
+    /// # Errors
+    ///
+    /// - Returns [`AccessError::NoSuchResource'] if an instance of type `T` does not exist.
+    /// - Returns [`AccessError::AlreadyBorrowed'] if there is an existing mutable reference to
+    ///   `T`.
     pub fn get<T: Resource>(&self) -> Result<AtomicRef<T>, AccessError> {
         // Safety: `Resources` is `!Send` / `!Sync`, so it is not possible for it to access the
         // `UnsafeResources` store from another thread.
@@ -84,6 +100,12 @@ impl Resources {
         }
     }
 
+    /// Returns an immutable reference to the stored `T`, if it exists.
+    ///
+    /// # Errors
+    ///
+    /// - Returns [`AccessError::NoSuchResource'] if an instance of type `T` does not exist.
+    /// - Returns [`AccessError::AlreadyBorrowed'] if there is an existing reference to `T`.
     pub fn get_mut<T: Resource>(&self) -> Result<AtomicRefMut<T>, AccessError> {
         // Safety: `Resources` is `!Send` / `!Sync`, so it is not possible for it to modify the
         // `UnsafeResources` store on another thread.
