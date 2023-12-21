@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 atomic_refcell = "0.1.13"
+downcast-rs = "1.2.0"
