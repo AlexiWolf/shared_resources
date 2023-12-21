@@ -108,7 +108,7 @@ impl UnsafeResources {
     ///
     /// It's not safe to access `!Send` / `!Sync` types on any thread other than the one that owns 
     /// the resources store.  Only `Send` / `Sync` types can be accessed from other threads.
-    pub unsafe fn remove(&mut self, type_id: &TypeId) {
+    pub unsafe fn remove(&mut self, type_id: &TypeId) -> Option<Box<dyn Resource>> {
         self.resources.remove(type_id).map(|cell| cell.into_inner())
     }
 
