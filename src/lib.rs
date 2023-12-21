@@ -1,3 +1,4 @@
+use atomic_refcell::*;
 use downcast_rs::{Downcast, impl_downcast};
 
 pub trait Resource: Downcast + 'static {}
@@ -14,6 +15,10 @@ pub struct Resources {
 impl Resources {
     pub fn insert<T: Resource>(&mut self, resource: T) {
         
+    }
+
+    pub fn get_mut<T: Resource>(&self) -> Result<AtomicRefMut<T>, AccessError> {
+        todo!()
     }
 }
 
