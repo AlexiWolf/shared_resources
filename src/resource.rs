@@ -9,18 +9,18 @@ impl<T> Resource for T where T: 'static {}
 
 impl_downcast!(Resource);
 
-struct ResourceCell {
+pub(crate) struct ResourceCell {
     inner: AtomicRefCell<Box<dyn Resource>>,
 }
 
 impl ResourceCell {
-    fn new(resource: Box<dyn Resource>) -> Self {
+    pub fn new(resource: Box<dyn Resource>) -> Self {
         Self {
             inner: AtomicRefCell::new(resource),
         }
     }
 
-    fn into_inner(self) -> Box<dyn Resource> {
+    pub fn into_inner(self) -> Box<dyn Resource> {
         self.inner.into_inner()
     }
 
