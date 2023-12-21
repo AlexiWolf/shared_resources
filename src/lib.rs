@@ -1,6 +1,7 @@
 use atomic_refcell::*;
 use downcast_rs::{Downcast, impl_downcast};
 
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum AccessError {
 
 }
