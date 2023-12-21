@@ -62,6 +62,10 @@ impl UnsafeResources {
         let type_id = resource.type_id();
         self.resources.insert(type_id, ResourceCell::new(resource));
     }
+
+    pub unsafe fn get(&self, type_id: &TypeId) -> Option<&ResourceCell> {
+        None
+    }
 }
 
 #[cfg(test)]
