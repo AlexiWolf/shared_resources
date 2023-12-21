@@ -98,10 +98,10 @@ impl UnsafeResources {
 
     /// # Safety
     ///
-    /// It's not safe to modify `!Send` / `!Sync` on any thread other than the one that owns the
-    /// resources store.  Only `Send` / `Sync` types can be modified from other threads.
+    /// It's not safe to access `!Send` / `!Sync` on any thread other than the one that owns the
+    /// resources store.  Only `Send` / `Sync` types can be accessed from other threads.
     pub unsafe fn get(&self, type_id: &TypeId) -> Option<&ResourceCell> {
-        None
+        self.resources.get(type_id)
     }
 }
 
