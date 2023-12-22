@@ -37,8 +37,8 @@ impl Resources {
     ///
     /// # Errors
     ///
-    /// - Returns [`AccessError::NoSuchResource'] if an instance of type `T` does not exist.
-    /// - Returns [`AccessError::AlreadyBorrowed'] if there is an existing mutable reference to
+    /// - Returns [`AccessError::NoSuchResource`] if an instance of type `T` does not exist.
+    /// - Returns [`AccessError::AlreadyBorrowed`] if there is an existing mutable reference to
     ///   `T`.
     pub fn get<T: Resource>(&self) -> Result<AtomicRef<T>, AccessError> {
         // Safety: `Resources` is `!Send` / `!Sync`, so it is not possible for it to access the
@@ -54,8 +54,8 @@ impl Resources {
     ///
     /// # Errors
     ///
-    /// - Returns [`AccessError::NoSuchResource'] if an instance of type `T` does not exist.
-    /// - Returns [`AccessError::AlreadyBorrowed'] if there is an existing reference to `T`.
+    /// - Returns [`AccessError::NoSuchResource`] if an instance of type `T` does not exist.
+    /// - Returns [`AccessError::AlreadyBorrowed`] if there is an existing reference to `T`.
     pub fn get_mut<T: Resource>(&self) -> Result<AtomicRefMut<T>, AccessError> {
         // Safety: `Resources` is `!Send` / `!Sync`, so it is not possible for it to modify the
         // `UnsafeResources` store on another thread.
