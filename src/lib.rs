@@ -37,7 +37,7 @@
 //! }
 //!
 //! // Remove the resource from the store.
-//! // This function returns the removed resource back to the caller. 
+//! // The resource is returned to the caller.
 //! let resource = resources.remove::<ExampleResource>().unwrap();
 //! assert_eq!(resource.0, "Goodbye, World!");
 //! #
