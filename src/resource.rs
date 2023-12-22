@@ -3,6 +3,9 @@ use downcast_rs::{impl_downcast, Downcast};
 
 use crate::AccessError;
 
+/// A type that can be stored in the resource store.
+///
+/// This trait is automatically implemented for types which meet the requirements.
 pub trait Resource: Downcast + 'static {}
 
 impl<T> Resource for T where T: 'static {}
