@@ -124,6 +124,16 @@ mod tests {
             assert_eq!(borrow_c.unwrap_err(), AccessError::AlreadyBorrowed);
         }
     }
+
+    #[test]
+    fn should_handle_missing_resources() {
+        let resources = Resources::default();
+        let borrow_a = resources.get::<TestResource>();
+        let borrow_b = resources.get_mut::<TestResource>();
+
+        assert_eq!(borrow_a.unwrap_err(), AccessError::NoSuchResource);
+        assert_eq!(borrow_b.unwrap_err(), AccessError::NoSuchResource);
+    }
 }
 
 /// Provides a [`Resource`] container which does run-time borrow-checking, but *does not* ensure
