@@ -54,3 +54,11 @@ impl ResourceCell {
         }
     }
 }
+
+pub struct Ref<'a, T> {
+    inner: &'a AtomicRef<'a, T>,
+}
+
+pub struct RefMut<'a, T> {
+    inner: &'a AtomicRefMut<'a, T>,
+}
