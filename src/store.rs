@@ -73,6 +73,10 @@ pub struct ResourcesSync<'a> {
     inner: &'a Resources,
 }
 
+// # Safety
+//
+// Access to stored resources is restricted to `Send`, and `Sync` types only.  Making access to 
+// `!Send`, and `!Sync` types on other threads impossible. 
 unsafe impl<'a> Send for ResourcesSync<'a> {}
 unsafe impl<'a> Sync for ResourcesSync<'a> {}
 
