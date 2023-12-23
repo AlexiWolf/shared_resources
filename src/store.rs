@@ -167,7 +167,7 @@ mod tests {
 
         let resources_sync = resources.sync();
 
-        let handle = thread::spawn(|| {
+        let handle = thread::spawn(move || {
             let resource = resources_sync.get::<TestResource>().unwrap();
         });
     }
