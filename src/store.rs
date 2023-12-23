@@ -92,6 +92,14 @@ impl<'a> ResourcesSync<'a> {
             None => Err(AccessError::NoSuchResource),
         }
     }
+
+    pub fn get_mut<T: Resource + Send>(&self) -> Result<RefMut<T>, AccessError> {
+        let type_id = TypeId::of::<T>();
+        match unsafe { self.inner.get(&type_id) } {
+            Some(cell) => Ok(cell.try_borrow_mut::<T>()?),
+            None => Err(AccessError::NoSuchResource),
+        }
+    }
 }
 
 #[cfg(test)]
