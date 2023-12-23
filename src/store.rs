@@ -32,7 +32,7 @@ impl Resources {
     }
 
     pub fn sync(&self) -> ResourcesSync {
-        ResourcesSync::new(&self.inner)
+        ResourcesSync::new(&self)
     }
 
     /// Returns an immutable reference to the stored `T`, if it exists.
@@ -71,6 +71,12 @@ impl Resources {
 
 pub struct ResourcesSync<'a> {
     inner: &'a Resources,
+}
+
+impl<'a> ResourcesSync<'a> {
+    pub(crate) fn new(inner: &'a Resources) -> Self {
+        Self { inner }
+    }
 }
 
 #[cfg(test)]
