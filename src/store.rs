@@ -65,6 +65,10 @@ impl Resources {
     }
 }
 
+pub struct ResourcesSync<'a> {
+    inner: &'a Resources,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
