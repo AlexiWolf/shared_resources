@@ -69,19 +69,19 @@ impl Resources {
     }
 }
 
-pub struct ResourcesSync<'a> {
-    inner: &'a Resources,
+pub struct ResourcesSync {
+    inner: &'static Resources,
 }
 
 // # Safety
 //
 // Access to stored resources is restricted to `Send`, and `Sync` types only.  Making access to 
 // `!Send`, and `!Sync` types on other threads impossible. 
-unsafe impl<'a> Send for ResourcesSync<'a> {}
-unsafe impl<'a> Sync for ResourcesSync<'a> {}
+unsafe impl Send for ResourcesSync {}
+unsafe impl Sync for ResourcesSync {}
 
-impl<'a> ResourcesSync<'a> {
-    pub(crate) fn new(inner: &'a Resources) -> Self {
+impl ResourcesSync {
+    pub(crate) fn new(inner: &'static Resources) -> Self {
         Self { inner }
     }
 
