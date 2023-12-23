@@ -55,6 +55,8 @@ impl ResourceCell {
     }
 }
 
+/// An immutable reference to a [`Resource`] stored in the [`Resources`](crate::Resources) 
+/// container.
 #[derive(Debug)]
 pub struct Ref<'a, T: Resource + 'static> {
     inner: AtomicRef<'a, T>,
@@ -74,6 +76,7 @@ impl<'a, T> std::ops::Deref for Ref<'a, T> {
     }
 }
 
+/// A mutable reference to a [`Resource`] stored in the [`Resources`](crate::Resources) container.
 #[derive(Debug)]
 pub struct RefMut<'a, T: Resource + 'static> {
     inner: AtomicRefMut<'a, T>,
