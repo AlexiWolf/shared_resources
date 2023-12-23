@@ -56,8 +56,16 @@ impl ResourceCell {
 }
 
 #[derive(Debug)]
-pub struct Ref<'a, T: Resource> {
-    inner: &'a AtomicRef<'a, T>,
+pub struct Ref<'a, T: Resource + 'static> {
+    inner: &'a AtomicRef<'static, T>,
+}
+
+impl<'a, T> std::ops::Deref for Ref<'a, T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        self.inner.deref()
+    }
 }
 
 #[derive(Debug)]
