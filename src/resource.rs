@@ -20,7 +20,7 @@ impl std::fmt::Debug for ResourceCell {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let type_id = self.as_any().type_id();
         f.debug_struct("ResourceCell")
-            .field("inner", &type_id) 
+            .field("inner", &type_id)
             .finish()
     }
 }
