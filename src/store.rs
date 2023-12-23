@@ -77,6 +77,10 @@ impl<'a> ResourcesSync<'a> {
     pub(crate) fn new(inner: &'a Resources) -> Self {
         Self { inner }
     }
+
+    pub fn get<T: Resource + Sync>(&self) -> Result<Ref<T>, AccessError> {
+        self.inner.get::<T>()
+    }
 }
 
 #[cfg(test)]
