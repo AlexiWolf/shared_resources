@@ -81,6 +81,8 @@ impl<'a> ResourcesSync<'a> {
 
 #[cfg(test)]
 mod tests {
+    use std::thread;
+
     use super::*;
 
     #[derive(Debug)]
@@ -153,6 +155,10 @@ mod tests {
         resources.insert(TestResource("Hello, World!"));
 
         let resources_sync = resources.sync();
+
+        let handle = thread::spawn(|| {
+            let resource = resources_sync.get::<TestResource>().unwrap();
+        });
     }
 }
 
