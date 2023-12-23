@@ -132,6 +132,14 @@ mod tests {
         assert_eq!(borrow_a.unwrap_err(), AccessError::NoSuchResource);
         assert_eq!(borrow_b.unwrap_err(), AccessError::NoSuchResource);
     }
+
+    #[test]
+    fn should_use_sync_handle() {
+        let mut resources = Resources::default();
+        resources.insert(TestResource("Hello, World!"));
+
+        let resources_sync = resources.sync();
+    }
 }
 
 /// Provides a [`Resource`] container which does run-time borrow-checking, but *does not* ensure
