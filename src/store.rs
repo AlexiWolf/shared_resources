@@ -71,6 +71,7 @@ impl Resources {
 mod tests {
     use super::*;
 
+    #[derive(Debug)]
     struct TestResource(&'static str);
 
     #[test]
@@ -98,6 +99,30 @@ mod tests {
         }
 
         assert!(resources.remove::<TestResource>().is_some());
+    }
+
+    #[test]
+    fn should_block_invalid_borrows() {
+        let mut resources = Resources::default();
+        resources.insert(TestResource("Hello, World!"));
+        {
+            let borrow_a = resources.get::<TestResource>();
+            let borrow_b = resources.get::<TestResource>();
+            let borrow_c = resources.get_mut::<TestResource>();
+
+            assert!(borrow_a.is_ok());
+            assert!(borrow_b.is_ok());
+            assert_eq!(borrow_c.unwrap_err(), AccessError::AlreadyBorrowed);
+        }
+        {
+            let borrow_a = resources.get_mut::<TestResource>();
+            let borrow_b = resources.get_mut::<TestResource>();
+            let borrow_c = resources.get::<TestResource>();
+
+            assert!(borrow_a.is_ok());
+            assert_eq!(borrow_b.unwrap_err(), AccessError::AlreadyBorrowed);
+            assert_eq!(borrow_c.unwrap_err(), AccessError::AlreadyBorrowed);
+        }
     }
 }
 
