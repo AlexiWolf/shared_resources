@@ -1,5 +1,9 @@
 # Shared Resources 
 
+[![CI](https://github.com/AlexiWolf/shared_resources/actions/workflows/ci.yml/badge.svg)](https://github.com/AlexiWolf/shared_resources/actions/workflows/ci.yml)
+[![Crates.io](https://img.shields.io/crates/l/shared_resources)](https://github.com/AlexiWolf/shared_resources#license)
+[![Crates.io](https://img.shields.io/crates/v/shared_resources)](https://crates.io/crates/shared_resources)
+
 Provides a `Resource` container, which safe access to a collection of
 resources. These resources are added at run-time by the user.  The store can 
 hold most types, and can contain up to 1 instance of each type.
