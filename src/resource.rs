@@ -16,6 +16,15 @@ pub(crate) struct ResourceCell {
     inner: AtomicRefCell<Box<dyn Resource>>,
 }
 
+impl std::fmt::Debug for ResourceCell {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let type_id = self.as_any().type_id();
+        f.debug_struct("ResourceCell")
+            .field("inner", &type_id) 
+            .finish()
+    }
+}
+
 impl ResourceCell {
     pub fn new(resource: Box<dyn Resource>) -> Self {
         Self {

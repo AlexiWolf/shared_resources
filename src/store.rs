@@ -5,7 +5,7 @@ use atomic_refcell::*;
 use crate::*;
 
 /// Provides a shared [`Resource`] container.
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct Resources {
     inner: UnsafeResources,
 }
@@ -103,7 +103,7 @@ mod tests {
 
 /// Provides a [`Resource`] container which does run-time borrow-checking, but *does not* ensure
 /// [`!Send`] / [`!Sync`] types are not accessed across threads.
-#[derive(Default)]
+#[derive(Default, Debug)]
 struct UnsafeResources {
     resources: HashMap<TypeId, ResourceCell>,
 }
