@@ -57,7 +57,15 @@ impl ResourceCell {
 
 #[derive(Debug)]
 pub struct Ref<'a, T: Resource + 'static> {
-    inner: &'a AtomicRef<'static, T>,
+    inner: AtomicRef<'a, T>,
+}
+
+impl<'a, T> From<AtomicRef<'a, T>> for Ref<'a, T> {
+    fn from(atomic_ref: AtomicRef<'a, T>) -> Self {
+        Self {
+            inner: atomic_ref,
+        }
+    }
 }
 
 impl<'a, T> std::ops::Deref for Ref<'a, T> {
@@ -70,7 +78,15 @@ impl<'a, T> std::ops::Deref for Ref<'a, T> {
 
 #[derive(Debug)]
 pub struct RefMut<'a, T: Resource + 'static> {
-    inner: &'a AtomicRefMut<'a, T>,
+    inner: AtomicRefMut<'a, T>,
+}
+
+impl<'a, T> From<AtomicRefMut<'a, T>> for RefMut<'a, T> {
+    fn from(atomic_ref: AtomicRefMut<'a, T>) -> Self {
+        Self {
+            inner: atomic_ref,
+        }
+    }
 }
 
 impl<'a, T> std::ops::Deref for RefMut<'a, T> {
