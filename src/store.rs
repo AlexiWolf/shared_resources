@@ -1,7 +1,5 @@
 use std::{any::TypeId, collections::HashMap};
 
-use atomic_refcell::*;
-
 use crate::*;
 
 /// Provides a shared [`Resource`] container.
