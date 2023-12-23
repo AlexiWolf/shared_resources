@@ -38,26 +38,25 @@ impl ResourceCell {
 
     pub fn try_borrow<T: Resource>(&self) -> Result<Ref<T>, AccessError> {
         match self.inner.try_borrow() {
-            Ok(borrow) => Ok(
-                Ref::from_atomic_ref(
-                    AtomicRef::map(borrow, |inner| { inner.downcast_ref().unwrap() })
-            )),
+            Ok(borrow) => Ok(Ref::from_atomic_ref(AtomicRef::map(borrow, |inner| {
+                inner.downcast_ref().unwrap()
+            }))),
             Err(_) => Err(AccessError::AlreadyBorrowed),
         }
     }
 
     pub fn try_borrow_mut<T: Resource>(&self) -> Result<RefMut<T>, AccessError> {
         match self.inner.try_borrow_mut() {
-            Ok(borrow) => Ok(
-                RefMut::from_atomic_ref(
-                    AtomicRefMut::map(borrow, |inner| { inner.downcast_mut().unwrap() })
-            )),
+            Ok(borrow) => Ok(RefMut::from_atomic_ref(AtomicRefMut::map(
+                borrow,
+                |inner| inner.downcast_mut().unwrap(),
+            ))),
             Err(_) => Err(AccessError::AlreadyBorrowed),
         }
     }
 }
 
-/// An immutable reference to a [`Resource`] stored in the [`Resources`](crate::Resources) 
+/// An immutable reference to a [`Resource`] stored in the [`Resources`](crate::Resources)
 /// container.
 #[derive(Debug)]
 pub struct Ref<'a, T: Resource + 'static> {
