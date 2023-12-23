@@ -170,8 +170,12 @@ mod tests {
         resources.insert(TestResource("Hello, World!"));
         let resources_sync = resources.sync();
         {
+            let mut resource = resources_sync.get_mut::<TestResource>().unwrap();
+            resource.0 = "Goodbye, World!";
+        }
+        {
             let resource = resources_sync.get::<TestResource>().unwrap();
-            assert_eq!(resource.0, "Hello, World!");
+            assert_eq!(resource.0, "Goodbye, World!");
         }
     }
 }
