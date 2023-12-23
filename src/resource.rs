@@ -56,11 +56,11 @@ impl ResourceCell {
 }
 
 #[derive(Debug)]
-pub struct Ref<'a, T> {
+pub struct Ref<'a, T: Resource> {
     inner: &'a AtomicRef<'a, T>,
 }
 
 #[derive(Debug)]
-pub struct RefMut<'a, T> {
+pub struct RefMut<'a, T: Resource> {
     inner: &'a AtomicRefMut<'a, T>,
 }
