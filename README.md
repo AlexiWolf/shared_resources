@@ -18,9 +18,8 @@ usage.
 
 ## Status
 
-Shared Resources is currently in very early development.  You should expect 
-missing features, bugs, changing APIs, and other spooky stuff until release 
-1.0.
+Shared Resources is mostly complete, but is not quite ready for release yet.
+Things may still change until release 1.0. 
 
 # License
 
