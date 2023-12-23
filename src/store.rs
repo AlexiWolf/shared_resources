@@ -85,6 +85,13 @@ impl<'a> ResourcesSync<'a> {
         Self { inner }
     }
 
+    /// Returns an immutable reference to the stored `T`, if it exists.
+    ///
+    /// # Errors
+    ///
+    /// - Returns [`AccessError::NoSuchResource`] if an instance of type `T` does not exist.
+    /// - Returns [`AccessError::AlreadyBorrowed`] if there is an existing mutable reference to
+    ///   `T`.
     pub fn get<T: Resource + Sync>(&self) -> Result<Ref<T>, AccessError> {
         let type_id = TypeId::of::<T>();
         match unsafe { self.inner.get(&type_id) } {
@@ -93,6 +100,12 @@ impl<'a> ResourcesSync<'a> {
         }
     }
 
+    /// Returns an immutable reference to the stored `T`, if it exists.
+    ///
+    /// # Errors
+    ///
+    /// - Returns [`AccessError::NoSuchResource`] if an instance of type `T` does not exist.
+    /// - Returns [`AccessError::AlreadyBorrowed`] if there is an existing reference to `T`.
     pub fn get_mut<T: Resource + Send>(&self) -> Result<RefMut<T>, AccessError> {
         let type_id = TypeId::of::<T>();
         match unsafe { self.inner.get(&type_id) } {
