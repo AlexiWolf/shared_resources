@@ -73,6 +73,9 @@ pub struct ResourcesSync<'a> {
     inner: &'a Resources,
 }
 
+unsafe impl<'a> Send for ResourcesSync<'a> {}
+unsafe impl<'a> Sync for ResourcesSync<'a> {}
+
 impl<'a> ResourcesSync<'a> {
     pub(crate) fn new(inner: &'a Resources) -> Self {
         Self { inner }
