@@ -40,7 +40,7 @@ impl Resources {
     /// - Returns [`AccessError::NoSuchResource`] if an instance of type `T` does not exist.
     /// - Returns [`AccessError::AlreadyBorrowed`] if there is an existing mutable reference to
     ///   `T`.
-    pub fn get<T: Resource>(&self) -> Result<AtomicRef<T>, AccessError> {
+    pub fn get<T: Resource>(&self) -> Result<Ref<T>, AccessError> {
         // Safety: `Resources` is `!Send` / `!Sync`, so it is not possible for it to access the
         // `UnsafeResources` store from another thread.
         let type_id = TypeId::of::<T>();
@@ -56,7 +56,7 @@ impl Resources {
     ///
     /// - Returns [`AccessError::NoSuchResource`] if an instance of type `T` does not exist.
     /// - Returns [`AccessError::AlreadyBorrowed`] if there is an existing reference to `T`.
-    pub fn get_mut<T: Resource>(&self) -> Result<AtomicRefMut<T>, AccessError> {
+    pub fn get_mut<T: Resource>(&self) -> Result<RefMut<T>, AccessError> {
         // Safety: `Resources` is `!Send` / `!Sync`, so it is not possible for it to modify the
         // `UnsafeResources` store on another thread.
         let type_id = TypeId::of::<T>();
