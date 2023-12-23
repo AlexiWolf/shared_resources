@@ -43,7 +43,7 @@ impl Resources {
         // `UnsafeResources` store from another thread.
         let type_id = TypeId::of::<T>();
         match unsafe { self.inner.get(&type_id) } {
-            Some(cell) => Ok(cell.try_borrow::<T>()?.into()),
+            Some(cell) => Ok((cell.try_borrow::<T>()?).into()),
             None => Err(AccessError::NoSuchResource),
         }
     }
@@ -59,7 +59,7 @@ impl Resources {
         // `UnsafeResources` store on another thread.
         let type_id = TypeId::of::<T>();
         match unsafe { self.inner.get(&type_id) } {
-            Some(cell) => Ok(cell.try_borrow_mut::<T>()?.into()),
+            Some(cell) => Ok((cell.try_borrow_mut::<T>()?).into()),
             None => Err(AccessError::NoSuchResource),
         }
     }
