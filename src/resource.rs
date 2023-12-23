@@ -39,7 +39,7 @@ impl ResourceCell {
     pub fn try_borrow<T: Resource>(&self) -> Result<Ref<T>, AccessError> {
         match self.inner.try_borrow() {
             Ok(borrow) => Ok(AtomicRef::map(borrow, |inner| {
-                inner.downcast_ref().unwrap()
+                Ref::from_atomic_ref(inner.downcast_ref().unwrap())
             })),
             Err(_) => Err(AccessError::AlreadyBorrowed),
         }
@@ -48,7 +48,7 @@ impl ResourceCell {
     pub fn try_borrow_mut<T: Resource>(&self) -> Result<RefMut<T>, AccessError> {
         match self.inner.try_borrow_mut() {
             Ok(borrow) => Ok(AtomicRefMut::map(borrow, |inner| {
-                inner.downcast_mut().unwrap()
+                RefMut::from_atomic_ref(inner.downcast_mut().unwrap())
             })),
             Err(_) => Err(AccessError::AlreadyBorrowed),
         }
