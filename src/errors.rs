@@ -18,3 +18,5 @@ impl std::fmt::Display for AccessError {
         }
     }
 }
+
+impl std::error::Error for AccessError {}
