@@ -96,8 +96,6 @@ impl<'a> ResourcesSync<'a> {
 
 #[cfg(test)]
 mod tests {
-    use std::thread;
-
     use super::*;
 
     #[derive(Debug)]
