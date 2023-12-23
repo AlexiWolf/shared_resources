@@ -31,8 +31,8 @@ impl Resources {
         }
     }
 
-    pub fn sync(&self) -> ResourcesSync {
-        ResourcesSync::new(&self)
+    pub fn sync(&mut self) -> ResourcesSync {
+        ResourcesSync::new(&self.inner)
     }
 
     /// Returns an immutable reference to the stored `T`, if it exists.
@@ -69,24 +69,28 @@ impl Resources {
     }
 }
 
-pub struct ResourcesSync {
-    inner: &'static Resources,
+pub struct ResourcesSync<'a> {
+    inner: &'a UnsafeResources,
 }
 
 // # Safety
 //
 // Access to stored resources is restricted to `Send`, and `Sync` types only.  Making access to 
 // `!Send`, and `!Sync` types on other threads impossible. 
-unsafe impl Send for ResourcesSync {}
-unsafe impl Sync for ResourcesSync {}
+unsafe impl<'a> Send for ResourcesSync<'a> {}
+unsafe impl<'a> Sync for ResourcesSync<'a> {}
 
-impl ResourcesSync {
-    pub(crate) fn new(inner: &'static Resources) -> Self {
+impl<'a> ResourcesSync<'a> {
+    fn new(inner: &'a UnsafeResources) -> Self {
         Self { inner }
     }
 
     pub fn get<T: Resource + Sync>(&self) -> Result<Ref<T>, AccessError> {
-        self.inner.get::<T>()
+        let type_id = TypeId::of::<T>();
+        match unsafe { self.inner.get(&type_id) } {
+            Some(cell) => Ok(cell.try_borrow::<T>()?),
+            None => Err(AccessError::NoSuchResource),
+        }
     }
 }
 
