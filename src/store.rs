@@ -170,6 +170,7 @@ mod tests {
         let handle = thread::spawn(move || {
             let resource = resources_sync.get::<TestResource>().unwrap();
         });
+        handle.join();
     }
 }
 
