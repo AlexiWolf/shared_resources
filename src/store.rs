@@ -31,6 +31,10 @@ impl Resources {
         }
     }
 
+    pub fn sync(&self) -> ResourcesSync {
+        ResourcesSync::new(&self.inner)
+    }
+
     /// Returns an immutable reference to the stored `T`, if it exists.
     ///
     /// # Errors
