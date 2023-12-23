@@ -81,3 +81,8 @@ impl<'a, T> std::ops::Deref for RefMut<'a, T> {
     }
 }
 
+impl<'a, T> std::ops::DerefMut for RefMut<'a, T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        self.inner.deref_mut()
+    }
+}
