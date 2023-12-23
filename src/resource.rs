@@ -69,6 +69,15 @@ impl<'a, T> std::ops::Deref for Ref<'a, T> {
 }
 
 #[derive(Debug)]
-pub struct RefMut<'a, T: Resource> {
+pub struct RefMut<'a, T: Resource + 'static> {
     inner: &'a AtomicRefMut<'a, T>,
 }
+
+impl<'a, T> std::ops::Deref for RefMut<'a, T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        self.inner.deref()
+    }
+}
+
