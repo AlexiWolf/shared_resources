@@ -168,13 +168,11 @@ mod tests {
     fn should_use_sync_handle() {
         let mut resources = Resources::default();
         resources.insert(TestResource("Hello, World!"));
-
         let resources_sync = resources.sync();
-
-        let handle = thread::spawn(move || {
+        {
             let resource = resources_sync.get::<TestResource>().unwrap();
-        });
-        handle.join();
+            assert_eq!(resource.0, "Hello, World!");
+        }
     }
 }
 
