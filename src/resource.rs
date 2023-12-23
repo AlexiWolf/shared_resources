@@ -63,7 +63,7 @@ pub struct Ref<'a, T: Resource + 'static> {
 }
 
 impl<'a, T> Ref<'a, T> {
-    fn from_atomic_ref(atomic_ref: AtomicRef<'a, T>) -> Self {
+    pub(crate) fn from_atomic_ref(atomic_ref: AtomicRef<'a, T>) -> Self {
         Self { inner: atomic_ref }
     }
 }
@@ -83,7 +83,7 @@ pub struct RefMut<'a, T: Resource + 'static> {
 }
 
 impl<'a, T> RefMut<'a, T> {
-    fn from_atomic_ref(atomic_ref: AtomicRefMut<'a, T>) -> Self {
+    pub(crate) fn from_atomic_ref(atomic_ref: AtomicRefMut<'a, T>) -> Self {
         Self { inner: atomic_ref }
     }
 }
