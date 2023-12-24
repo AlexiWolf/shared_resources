@@ -44,6 +44,48 @@
 //! # Ok(())
 //! # }
 //! ```
+//!
+//! ## Multi-threaded Use
+//!
+//! The default [`Resources`] container is not [`Send`], or [`Sync`], so it *cannot* be sent 
+//! between threads.  Instead, you must create a [`ResourcesSync`], which is a thread-safe handle 
+//! to the resources container that can be sent to other threads.  Any resource accessed through 
+//! the handle must, itself, be [`Send`] / [`Sync`].
+//!
+//! ```
+//! # use shared_resources::*;
+//! #
+//! # fn main() -> Result<(), AccessError> {
+//! #
+//! # struct ExampleResource(&'static str);
+//! # let resource = ExampleResource("Hello, World!");
+//! # let mut resources = Resources::default();
+//! # resources.insert(resource);
+//! #
+//! // Create a ResourcesSync from the Resources container.
+//! let resources_sync = resources.sync();
+//!
+//! std::thread::scope(|scope| {
+//!     scope
+//!         .spawn(|| {
+//!             let mut resource = resources_sync.get_mut::<ExampleResource>().unwrap();
+//!             resource.0 = "Goodbye, World!";
+//!         })
+//!         .join()
+//!         .unwrap();
+//!     scope
+//!         .spawn(|| {
+//!             let resource = resources_sync.get::<ExampleResource>().unwrap();
+//!             assert_eq!(resource.0, "Goodbye, World!");
+//!         })
+//!         .join()
+//!         .unwrap();
+//! });
+//! #
+//! # Ok(())
+//! # }
+//!
+//! ```
 
 mod errors;
 pub use errors::*;
