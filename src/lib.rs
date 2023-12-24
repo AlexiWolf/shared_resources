@@ -1,4 +1,4 @@
-//! This crate provides a shared resources container which is thread-safe, and lock-free.
+//! Provides a shared resources container which is thread-safe, and lock-free.
 //!
 //! The [`Resources`] struct, is a container of [`Resource`] objects. Resources are inserted at 
 //! run-time. The container stores up to 1 instance of each type.  Stored resources can be accessed
