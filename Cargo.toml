@@ -1,5 +1,10 @@
 [package]
 name = "shared_resources"
+description = "Provides a shared resources container which is thread-safe, and lock-free."
+authors = ["AlexiWolf <alexi@wolvesin.space>"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/AlexiWolf/shared_resources"
+homepage = "https://github.com/AlexiWolf/shared_resources"
 version = "0.1.0"
 edition = "2021"
 
