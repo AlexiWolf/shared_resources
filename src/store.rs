@@ -220,6 +220,9 @@ impl UnsafeResources {
         self.resources.remove(type_id).map(|cell| cell.into_inner())
     }
 
+    /// # Safety
+    ///
+    /// [`!Sync`] types cannot be accessed from any thread that doesn't own the resource store.
     pub unsafe fn try_borrow<T: Resource>(&self) -> Result<Ref<T>, AccessError> {
         let type_id = TypeId::of::<T>();
         match self.resources.get(&type_id) {
@@ -227,6 +230,10 @@ impl UnsafeResources {
             None => Err(AccessError::NoSuchResource),
         }
     }
+
+    /// # Safety
+    ///
+    /// [`!Send`] types cannot be accessed from any thread that doesn't own the resource store.
     pub unsafe fn try_borrow_mut<T: Resource>(&self) -> Result<RefMut<T>, AccessError> {
         let type_id = TypeId::of::<T>();
         match self.resources.get(&type_id) {
