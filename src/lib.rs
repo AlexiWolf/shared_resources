@@ -74,6 +74,8 @@
 //! // Create a ResourcesSync from the Resources container.
 //! let resources_sync = resources.sync();
 //!
+//! // You must spawn the threads with a Scope, otherwise you'll get an error that the borrow
+//! // outlives the container.
 //! std::thread::scope(|scope| {
 //!     scope
 //!         .spawn(|| {
