@@ -45,11 +45,7 @@ impl Resources {
     pub fn get<T: Resource>(&self) -> Result<Ref<T>, AccessError> {
         // Safety: `Resources` is `!Send` / `!Sync`, so it is not possible for it to access the
         // `UnsafeResources` store from another thread.
-        let type_id = TypeId::of::<T>();
-        match unsafe { self.inner.get(&type_id) } {
-            Some(cell) => Ok(cell.try_borrow::<T>()?),
-            None => Err(AccessError::NoSuchResource),
-        }
+        unsafe { self.inner.try_borrow::<T>() }
     }
 
     /// Returns an immutable reference to the stored `T`, if it exists.
@@ -61,14 +57,14 @@ impl Resources {
     pub fn get_mut<T: Resource>(&self) -> Result<RefMut<T>, AccessError> {
         // Safety: `Resources` is `!Send` / `!Sync`, so it is not possible for it to modify the
         // `UnsafeResources` store on another thread.
-        let type_id = TypeId::of::<T>();
-        match unsafe { self.inner.get(&type_id) } {
-            Some(cell) => Ok(cell.try_borrow_mut::<T>()?),
-            None => Err(AccessError::NoSuchResource),
-        }
+        unsafe { self.inner.try_borrow_mut::<T>() }
     }
+
 }
 
+/// Provides a thread-safe handle to the [`Resources`] container.  
+///
+/// Only allows access to [`Send`] / [`Sync`] resources.
 pub struct ResourcesSync<'a> {
     inner: &'a UnsafeResources,
 }
@@ -93,11 +89,7 @@ impl<'a> ResourcesSync<'a> {
     /// - Returns [`AccessError::AlreadyBorrowed`] if there is an existing mutable reference to
     ///   `T`.
     pub fn get<T: Resource + Sync>(&self) -> Result<Ref<T>, AccessError> {
-        let type_id = TypeId::of::<T>();
-        match unsafe { self.inner.get(&type_id) } {
-            Some(cell) => Ok(cell.try_borrow::<T>()?),
-            None => Err(AccessError::NoSuchResource),
-        }
+        unsafe { self.inner.try_borrow::<T>() }
     }
 
     /// Returns an immutable reference to the stored `T`, if it exists.
@@ -107,11 +99,7 @@ impl<'a> ResourcesSync<'a> {
     /// - Returns [`AccessError::NoSuchResource`] if an instance of type `T` does not exist.
     /// - Returns [`AccessError::AlreadyBorrowed`] if there is an existing reference to `T`.
     pub fn get_mut<T: Resource + Send>(&self) -> Result<RefMut<T>, AccessError> {
-        let type_id = TypeId::of::<T>();
-        match unsafe { self.inner.get(&type_id) } {
-            Some(cell) => Ok(cell.try_borrow_mut::<T>()?),
-            None => Err(AccessError::NoSuchResource),
-        }
+        unsafe { self.inner.try_borrow_mut::<T>() }
     }
 }
 
@@ -223,6 +211,21 @@ impl UnsafeResources {
     /// [`!Send`] types cannot be removed from any thread that doesn't own the resource store.
     pub unsafe fn remove(&mut self, type_id: &TypeId) -> Option<Box<dyn Resource>> {
         self.resources.remove(type_id).map(|cell| cell.into_inner())
+    }
+
+    pub unsafe fn try_borrow<T: Resource>(&self) -> Result<Ref<T>, AccessError> {
+        let type_id = TypeId::of::<T>();
+        match self.resources.get(&type_id) {
+            Some(cell) => Ok(cell.try_borrow::<T>()?),
+            None => Err(AccessError::NoSuchResource),
+        }
+    }
+    pub unsafe fn try_borrow_mut <T: Resource>(&self) -> Result<RefMut<T>, AccessError> {
+        let type_id = TypeId::of::<T>();
+        match self.resources.get(&type_id) {
+            Some(cell) => Ok(cell.try_borrow_mut::<T>()?),
+            None => Err(AccessError::NoSuchResource),
+        }
     }
 
     /// # Safety
