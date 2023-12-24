@@ -5,10 +5,11 @@
 [![Crates.io](https://img.shields.io/crates/v/shared_resources)](https://crates.io/crates/shared_resources)
 
 This crate provides a `Resources` struct, which stores a collection of
-`Resoruce` types added in at run-time. The store contains up to 1 of each
-type, can be shared between threads, and provides safe, concurrent access to 
-shared resources.  The API is lock-free, and borrowing rules are checked at
-run-time.
+shared `Resoruce` types added in at run-time.  The store contains up to 1 
+of each type.  Borrowing rules are checked at run-time.
+
+The resources container has a thread-safe handle, which provides safe, 
+concurrent access to shared resources.  The API is lock-free.
 
 The design is based heavily on the `Resources` struct found in 
 [Legion](https://crates.io/crates/legion).  It also takes ideas from
