@@ -234,12 +234,4 @@ impl UnsafeResources {
             None => Err(AccessError::NoSuchResource),
         }
     }
-
-    /// # Safety
-    ///
-    /// [`!Send`] / [`!Sync`] types cannot be accessed from any thread that doesn't own the
-    /// resource store.
-    pub unsafe fn get(&self, type_id: &TypeId) -> Option<&ResourceCell> {
-        self.resources.get(type_id)
-    }
 }
