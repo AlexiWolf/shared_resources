@@ -89,6 +89,8 @@ impl<'a> ResourcesSync<'a> {
     /// - Returns [`AccessError::AlreadyBorrowed`] if there is an existing mutable reference to
     ///   `T`.
     pub fn get<T: Resource + Sync>(&self) -> Result<Ref<T>, AccessError> {
+        // Safety: This function only allows access to resources which are `Sync`, so it is
+        // impossible to access `!Sync` resources across threads.
         unsafe { self.inner.try_borrow::<T>() }
     }
 
@@ -99,6 +101,8 @@ impl<'a> ResourcesSync<'a> {
     /// - Returns [`AccessError::NoSuchResource`] if an instance of type `T` does not exist.
     /// - Returns [`AccessError::AlreadyBorrowed`] if there is an existing reference to `T`.
     pub fn get_mut<T: Resource + Send>(&self) -> Result<RefMut<T>, AccessError> {
+        // Safety: This function only allows access to resources which are `Send`, so it is
+        // impossible to access `!Send` resources across threads.
         unsafe { self.inner.try_borrow_mut::<T>() }
     }
 }
