@@ -43,8 +43,7 @@ impl Resources {
     /// - Returns [`AccessError::AlreadyBorrowed`] if there is an existing mutable reference to
     ///   `T`.
     pub fn get<T: Resource>(&self) -> Result<Ref<T>, AccessError> {
-        // Safety: `Resources` is `!Send` / `!Sync`, so it is not possible for it to access the
-        // `UnsafeResources` store from another thread.
+        // Safety: `Resources` is `!Send` / `!Sync`, so it is impossible to send it across threads.
         unsafe { self.inner.try_borrow::<T>() }
     }
 
@@ -55,8 +54,7 @@ impl Resources {
     /// - Returns [`AccessError::NoSuchResource`] if an instance of type `T` does not exist.
     /// - Returns [`AccessError::AlreadyBorrowed`] if there is an existing reference to `T`.
     pub fn get_mut<T: Resource>(&self) -> Result<RefMut<T>, AccessError> {
-        // Safety: `Resources` is `!Send` / `!Sync`, so it is not possible for it to modify the
-        // `UnsafeResources` store on another thread.
+        // Safety: `Resources` is `!Send` / `!Sync`, so it is impossible to send it across threads.
         unsafe { self.inner.try_borrow_mut::<T>() }
     }
 
