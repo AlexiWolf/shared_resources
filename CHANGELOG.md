@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 - Added `Resources` struct.
+- Added `ResourcesSync` struct.
 - Added `Resource` trait.
 - Added `AccessError` enum.
 - Added `Ref` struct.
