@@ -57,7 +57,6 @@ impl Resources {
         // Safety: `Resources` is `!Send` / `!Sync`, so it is impossible to send it across threads.
         unsafe { self.inner.try_borrow_mut::<T>() }
     }
-
 }
 
 /// Provides a thread-safe handle to the [`Resources`] container.  
@@ -69,8 +68,8 @@ pub struct ResourcesSync<'a> {
 
 // # Safety
 //
-// Access to stored resources is restricted to `Send`, and `Sync` types only.  Making access to 
-// `!Send`, and `!Sync` types on other threads impossible. 
+// Access to stored resources is restricted to `Send`, and `Sync` types only.  Making access to
+// `!Send`, and `!Sync` types on other threads impossible.
 unsafe impl<'a> Send for ResourcesSync<'a> {}
 unsafe impl<'a> Sync for ResourcesSync<'a> {}
 
@@ -180,14 +179,20 @@ mod tests {
         let resources_sync = resources.sync();
 
         std::thread::scope(|scope| {
-            scope.spawn(|| {
-                let mut resource = resources_sync.get_mut::<TestResource>().unwrap();
-                resource.0 = "Goodbye, World!";
-            }).join().unwrap();
-            scope.spawn(|| {
-                let resource = resources_sync.get::<TestResource>().unwrap();
-                assert_eq!(resource.0, "Goodbye, World!");
-            }).join().unwrap();
+            scope
+                .spawn(|| {
+                    let mut resource = resources_sync.get_mut::<TestResource>().unwrap();
+                    resource.0 = "Goodbye, World!";
+                })
+                .join()
+                .unwrap();
+            scope
+                .spawn(|| {
+                    let resource = resources_sync.get::<TestResource>().unwrap();
+                    assert_eq!(resource.0, "Goodbye, World!");
+                })
+                .join()
+                .unwrap();
         });
     }
 }
@@ -222,7 +227,7 @@ impl UnsafeResources {
             None => Err(AccessError::NoSuchResource),
         }
     }
-    pub unsafe fn try_borrow_mut <T: Resource>(&self) -> Result<RefMut<T>, AccessError> {
+    pub unsafe fn try_borrow_mut<T: Resource>(&self) -> Result<RefMut<T>, AccessError> {
         let type_id = TypeId::of::<T>();
         match self.resources.get(&type_id) {
             Some(cell) => Ok(cell.try_borrow_mut::<T>()?),
