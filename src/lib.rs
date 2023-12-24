@@ -1,4 +1,4 @@
-//! Provides a shared resource container.
+//! This crate provides a shared resources container which is thread-safe, and lock-free.
 //!
 //! # Examples
 //!
