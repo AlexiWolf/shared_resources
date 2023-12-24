@@ -31,6 +31,10 @@ impl Resources {
         }
     }
 
+    pub fn sync(&mut self) -> ResourcesSync {
+        ResourcesSync::new(&self.inner)
+    }
+
     /// Returns an immutable reference to the stored `T`, if it exists.
     ///
     /// # Errors
@@ -39,13 +43,8 @@ impl Resources {
     /// - Returns [`AccessError::AlreadyBorrowed`] if there is an existing mutable reference to
     ///   `T`.
     pub fn get<T: Resource>(&self) -> Result<Ref<T>, AccessError> {
-        // Safety: `Resources` is `!Send` / `!Sync`, so it is not possible for it to access the
-        // `UnsafeResources` store from another thread.
-        let type_id = TypeId::of::<T>();
-        match unsafe { self.inner.get(&type_id) } {
-            Some(cell) => Ok(cell.try_borrow::<T>()?),
-            None => Err(AccessError::NoSuchResource),
-        }
+        // Safety: `Resources` is `!Send` / `!Sync`, so it is impossible to send it across threads.
+        unsafe { self.inner.try_borrow::<T>() }
     }
 
     /// Returns an immutable reference to the stored `T`, if it exists.
@@ -55,13 +54,53 @@ impl Resources {
     /// - Returns [`AccessError::NoSuchResource`] if an instance of type `T` does not exist.
     /// - Returns [`AccessError::AlreadyBorrowed`] if there is an existing reference to `T`.
     pub fn get_mut<T: Resource>(&self) -> Result<RefMut<T>, AccessError> {
-        // Safety: `Resources` is `!Send` / `!Sync`, so it is not possible for it to modify the
-        // `UnsafeResources` store on another thread.
-        let type_id = TypeId::of::<T>();
-        match unsafe { self.inner.get(&type_id) } {
-            Some(cell) => Ok(cell.try_borrow_mut::<T>()?),
-            None => Err(AccessError::NoSuchResource),
-        }
+        // Safety: `Resources` is `!Send` / `!Sync`, so it is impossible to send it across threads.
+        unsafe { self.inner.try_borrow_mut::<T>() }
+    }
+}
+
+/// Provides a thread-safe handle to the [`Resources`] container.  
+///
+/// Only allows access to [`Send`] / [`Sync`] resources.
+pub struct ResourcesSync<'a> {
+    inner: &'a UnsafeResources,
+}
+
+// # Safety
+//
+// Access to stored resources is restricted to `Send`, and `Sync` types only.  Making access to
+// `!Send`, and `!Sync` types on other threads impossible.
+unsafe impl<'a> Send for ResourcesSync<'a> {}
+unsafe impl<'a> Sync for ResourcesSync<'a> {}
+
+impl<'a> ResourcesSync<'a> {
+    fn new(inner: &'a UnsafeResources) -> Self {
+        Self { inner }
+    }
+
+    /// Returns an immutable reference to the stored `T`, if it exists.
+    ///
+    /// # Errors
+    ///
+    /// - Returns [`AccessError::NoSuchResource`] if an instance of type `T` does not exist.
+    /// - Returns [`AccessError::AlreadyBorrowed`] if there is an existing mutable reference to
+    ///   `T`.
+    pub fn get<T: Resource + Sync>(&self) -> Result<Ref<T>, AccessError> {
+        // Safety: This function only allows access to resources which are `Sync`, so it is
+        // impossible to access `!Sync` resources across threads.
+        unsafe { self.inner.try_borrow::<T>() }
+    }
+
+    /// Returns an immutable reference to the stored `T`, if it exists.
+    ///
+    /// # Errors
+    ///
+    /// - Returns [`AccessError::NoSuchResource`] if an instance of type `T` does not exist.
+    /// - Returns [`AccessError::AlreadyBorrowed`] if there is an existing reference to `T`.
+    pub fn get_mut<T: Resource + Send>(&self) -> Result<RefMut<T>, AccessError> {
+        // Safety: This function only allows access to resources which are `Send`, so it is
+        // impossible to access `!Send` resources across threads.
+        unsafe { self.inner.try_borrow_mut::<T>() }
     }
 }
 
@@ -132,6 +171,30 @@ mod tests {
         assert_eq!(borrow_a.unwrap_err(), AccessError::NoSuchResource);
         assert_eq!(borrow_b.unwrap_err(), AccessError::NoSuchResource);
     }
+
+    #[test]
+    fn should_use_sync_handle() {
+        let mut resources = Resources::default();
+        resources.insert(TestResource("Hello, World!"));
+        let resources_sync = resources.sync();
+
+        std::thread::scope(|scope| {
+            scope
+                .spawn(|| {
+                    let mut resource = resources_sync.get_mut::<TestResource>().unwrap();
+                    resource.0 = "Goodbye, World!";
+                })
+                .join()
+                .unwrap();
+            scope
+                .spawn(|| {
+                    let resource = resources_sync.get::<TestResource>().unwrap();
+                    assert_eq!(resource.0, "Goodbye, World!");
+                })
+                .join()
+                .unwrap();
+        });
+    }
 }
 
 /// Provides a [`Resource`] container which does run-time borrow-checking, but *does not* ensure
@@ -159,9 +222,23 @@ impl UnsafeResources {
 
     /// # Safety
     ///
-    /// [`!Send`] / [`!Sync`] types cannot be accessed from any thread that doesn't own the
-    /// resource store.
-    pub unsafe fn get(&self, type_id: &TypeId) -> Option<&ResourceCell> {
-        self.resources.get(type_id)
+    /// [`!Sync`] types cannot be accessed from any thread that doesn't own the resource store.
+    pub unsafe fn try_borrow<T: Resource>(&self) -> Result<Ref<T>, AccessError> {
+        let type_id = TypeId::of::<T>();
+        match self.resources.get(&type_id) {
+            Some(cell) => Ok(cell.try_borrow::<T>()?),
+            None => Err(AccessError::NoSuchResource),
+        }
+    }
+
+    /// # Safety
+    ///
+    /// [`!Send`] types cannot be accessed from any thread that doesn't own the resource store.
+    pub unsafe fn try_borrow_mut<T: Resource>(&self) -> Result<RefMut<T>, AccessError> {
+        let type_id = TypeId::of::<T>();
+        match self.resources.get(&type_id) {
+            Some(cell) => Ok(cell.try_borrow_mut::<T>()?),
+            None => Err(AccessError::NoSuchResource),
+        }
     }
 }
