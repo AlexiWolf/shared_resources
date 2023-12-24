@@ -1,4 +1,13 @@
-//! Provides a shared resource container.
+//! Provides a shared resources container which is thread-safe, and lock-free.
+//!
+//! The [`Resources`] struct, is a container of [`Resource`] objects. Resources are inserted at
+//! run-time. The container stores up to 1 instance of each type.  Stored resources can be accessed
+//! by the rest of the system through an immutable reference. Borrowing rules are checked at
+//! run-time.
+//!
+//! Thread-safe access is provided by the [`ResourcesSync`] struct.  It's similar to the
+//! [`Resources`] struct, except it only allows access to thread-safe resources, and can, itself,
+//! be sent to other threads.
 //!
 //! # Examples
 //!
@@ -43,6 +52,50 @@
 //! #
 //! # Ok(())
 //! # }
+//! ```
+//!
+//! ## Multi-threaded Use
+//!
+//! The default [`Resources`] container is not [`Send`], or [`Sync`], so it *cannot* be sent
+//! between threads.  Instead, you must create a [`ResourcesSync`], which is a thread-safe handle
+//! to the resources container that can be sent to other threads.  Any resource accessed through
+//! the handle must, itself, be [`Send`] / [`Sync`].
+//!
+//! ```
+//! # use shared_resources::*;
+//! #
+//! # fn main() -> Result<(), AccessError> {
+//! #
+//! # struct ExampleResource(&'static str);
+//! # let resource = ExampleResource("Hello, World!");
+//! # let mut resources = Resources::default();
+//! # resources.insert(resource);
+//! #
+//! // Create a ResourcesSync from the Resources container.
+//! let resources_sync = resources.sync();
+//!
+//! // You must spawn the threads with a Scope, otherwise you'll get an error that the borrow
+//! // outlives the container.
+//! std::thread::scope(|scope| {
+//!     scope
+//!         .spawn(|| {
+//!             let mut resource = resources_sync.get_mut::<ExampleResource>().unwrap();
+//!             resource.0 = "Goodbye, World!";
+//!         })
+//!         .join()
+//!         .unwrap();
+//!     scope
+//!         .spawn(|| {
+//!             let resource = resources_sync.get::<ExampleResource>().unwrap();
+//!             assert_eq!(resource.0, "Goodbye, World!");
+//!         })
+//!         .join()
+//!         .unwrap();
+//! });
+//! #
+//! # Ok(())
+//! # }
+//!
 //! ```
 
 mod errors;
