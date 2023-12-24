@@ -23,8 +23,7 @@ making it better-suited for general use-cases.
 
 ## Status
 
-Shared Resources is mostly complete, but is not quite ready for release yet.
-Things may still change until release 1.0. 
+Shared Resources is mostly complete.  Things may still change until release 1.0. 
 
 # License
 
