@@ -188,14 +188,17 @@ mod tests {
         let mut resources = Resources::default();
         resources.insert(TestResource("Hello, World!"));
         let resources_sync = resources.sync();
-        {
-            let mut resource = resources_sync.get_mut::<TestResource>().unwrap();
-            resource.0 = "Goodbye, World!";
-        }
-        {
-            let resource = resources_sync.get::<TestResource>().unwrap();
-            assert_eq!(resource.0, "Goodbye, World!");
-        }
+
+        std::thread::scope(|scope| {
+            scope.spawn(|| {
+                let mut resource = resources_sync.get_mut::<TestResource>().unwrap();
+                resource.0 = "Goodbye, World!";
+            }).join().unwrap();
+            scope.spawn(|| {
+                let resource = resources_sync.get::<TestResource>().unwrap();
+                assert_eq!(resource.0, "Goodbye, World!");
+            }).join().unwrap();
+        });
     }
 }
 
